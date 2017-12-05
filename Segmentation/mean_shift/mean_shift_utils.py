@@ -1,3 +1,7 @@
+from __future__ import division, print_function, unicode_literals
+
+import numpy as np
+
 def convert_img_vec(img_rgb):
     vecs = []
     img_Luv = cv2.cvtColor(img, cv2.COLOR_RGB2Luv)
@@ -23,7 +27,16 @@ def neighbourhood_points(X, x_centroid, distance = 5):
     return eligible_X
 
 
-def segmentation_kernel(hs, hr, C, X):
-    val = (C/(hs**2 * hr**3)) * np.exp(-(X[0]**2 + X[1]**2)/(hs**2)) * np.exp(-(X[2]**2 + X[3]**2 + X[4]**2)/(hr**2))()
+def segmentation_kernel(Xs, bandwidths, C=1):
+    # the argument bandwidths should be tuple
+    # Since the kernel bandwidths is consist of hs and hr
+    hs, hr = bandwidths
+    vals = []
+    for X in Xs:
+        val = (
+            C/(hs**2 * hr**3)) * np.exp(
+                -(X[0]**2 + X[1]**2)/(hs**2)) * np.exp(
+                    -(X[2]**2 + X[3]**2 + X[4]**2)/(hr**2))
+        vals.append(val)
 
-    return val
+    return vals
