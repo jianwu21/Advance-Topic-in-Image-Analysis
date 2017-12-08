@@ -1,10 +1,11 @@
 from __future__ import division, print_function, unicode_literals
 
+import cv2
 import numpy as np
 
 def convert_img_vec(img_rgb):
     vecs = []
-    img_Luv = cv2.cvtColor(img, cv2.COLOR_RGB2Luv)
+    img_Luv = cv2.cvtColor(img_rgb, cv2.COLOR_RGB2Luv)
 
     for x in range(img_Luv.shape[0]):
         for y in range(img_Luv.shape[1]):

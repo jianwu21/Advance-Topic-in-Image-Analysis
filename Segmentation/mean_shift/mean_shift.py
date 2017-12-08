@@ -10,16 +10,8 @@ class mean_shift(object):
     def __init__(self, kernel):
         self.kernel = kernel
 
-    def neighbourhood_points(self, X, x_centroid, distance):
-        eligible_X = []
-        for x in X:
-            distance_between = euclid_distance(x, x_centroid)
-            if distance_between <= distance:
-                eligible_X.append(x)
-        return eligible_X
-
     def _shift_points(self, point, points, kernel_bandwidth):
-        points = np.array(self.neighbourhood_points(points, point, 5))
+        points = np.array(points)
 
         point_weights = self.kernel(point-points, kernel_bandwidth)
         tiled_weights = np.tile(point_weights, [len(point), 1])
@@ -37,10 +29,14 @@ class mean_shift(object):
         iteration_number = 0
 
         still_shifting = [True] * points.shape[0]
-        while max_min_dist > MIN_DISTANCE:
+        # If we find final convercy value for each pixel point. That should
+        # take a lot of time on it. But the final result will be much better.
+        # So, please choose the steps by your perference.
+        '''
+        while(max_min_dist > MIN_DISTANCE):
             max_min_dist = 0
             iteration_number += 1
-            for i in range(0, len(shift_points)):
+            for i in range(len(shift_points)):
                 if not still_shifting[i]:
                     continue
                 p_new = shift_points[i]
@@ -52,5 +48,15 @@ class mean_shift(object):
                 if dist < MIN_DISTANCE:
                     still_shifting[i] = False
                 shift_points[i] = p_new
+            print(max_min_dist)
+            print(max_min_dist > MIN_DISTANCE)
+        '''
+        # It will take a lot of time if insisting the mimum distance. So use
+        # fixed number of iteration.
+        for i in range(len(shift_points)):
+            p_new = shift_points[i]
+            for j in range(20):
+                p_new = self._shift_points(p_new, points, kernel_bandwidth)
+            shift_points[i] = p_new
 
         return shift_points
