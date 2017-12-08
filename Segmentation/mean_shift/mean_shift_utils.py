@@ -31,12 +31,12 @@ def segmentation_kernel(Xs, bandwidths, C=1):
     # the argument bandwidths should be tuple
     # Since the kernel bandwidths is consist of hs and hr
     hs, hr = bandwidths
-    vals = []
+    weights = []
     for X in Xs:
-        val = (
+        weight = (
             C/(hs**2 * hr**3)) * np.exp(
                 -(X[0]**2 + X[1]**2)/(hs**2)) * np.exp(
                     -(X[2]**2 + X[3]**2 + X[4]**2)/(hr**2))
-        vals.append(val)
+        weights.append(weight)
 
-    return vals
+    return weights
