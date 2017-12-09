@@ -14,6 +14,17 @@ def convert_img_vec(img_rgb):
     return vecs
 
 
+def vec2img(vec, shape):
+    l, w = shape
+    img_o = np.array(vec)
+    img_info = img_o[:, 2:]
+    c = img_info.reshape(l, w, 3)
+    cc = np.array(c, dtype='uint8')
+    im = cv2.cvtColor(cc, cv2.COLOR_Luv2RGB)
+
+    return im
+
+
 def euclid_distance(x, xi):
     return np.sqrt(np.sum((x - xi)**2))
 

@@ -58,5 +58,9 @@ class mean_shift(object):
             for j in range(20):
                 p_new = self._shift_points(p_new, points, kernel_bandwidth)
             shift_points[i] = p_new
-
+            '''
+            if i % 100 == 0:
+                print('Filtering {}th pixel has been done!'.format(i))
+            '''
+            
         return shift_points
