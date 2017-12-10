@@ -35,7 +35,7 @@ class PointGrouper(object):
     def _distance_to_group(self, point, group):
         min_distance = sys.float_info.max
         for pt in group:
-            dist = ms_utils.euclidean_dist(point, pt)
+            dist = ms_utils.euclid_distance(point, pt)
             if dist < min_distance:
                 min_distance = dist
         return min_distance
