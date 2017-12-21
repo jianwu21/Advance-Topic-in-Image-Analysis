@@ -11,3 +11,7 @@ IEEEtranBST/
 
 Seg/
 
+# Training data and test data
+train/
+PlantCLEF2015TestDataWithAnnotations/
+
