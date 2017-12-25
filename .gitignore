@@ -14,4 +14,7 @@ Seg/
 # Training data and test data
 train/
 PlantCLEF2015TestDataWithAnnotations/
+test/
 
+# .db
+*.db
