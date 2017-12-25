@@ -46,8 +46,8 @@ def generate_train_data():
         )
         img_rgb = plt.imread('./train/' + img_id + '.jpg').astype('float')
 
-        if img_info['Content'] is not 'Flower':
-            print('Img {} is not belong to \'Flower\''.format(img_id))
+        if img_info['Content'] != 'Flower':
+            # print('Img {} is not belong to \'Flower\''.format(img_id))
             continue
 
         c.execute(
@@ -115,7 +115,7 @@ def generate_test_data():
         img_rgb = plt.imread('./test/' + img_id + '.jpg').astype('float')
 
         if img_info['Content'] is not 'Flower':
-            print('Img {} is not belong to \'Flower\''.format(img_id))
+            # print('Img {} is not belong to \'Flower\''.format(img_id))
             continue
 
         c.execute(
