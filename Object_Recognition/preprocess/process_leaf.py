@@ -11,8 +11,10 @@ def process_scan_leaf(scan_leaf_path, output_folder):
     image = cv2.imread(scan_leaf_path)
     grey_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     grey_image = cv2.GaussianBlur(grey_image, (5, 5), 3)
-    ret, threshold = cv2.threshold(grey_image, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
-    contours, hierarchy, _ = cv2.findContours(threshold, cv2.RETR_CCOMP, cv2.CHAIN_APPROX_NONE)
+    ret, threshold = cv2.threshold(
+        grey_image, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
+    contours, hierarchy, _ = cv2.findContours(
+        threshold, cv2.RETR_CCOMP, cv2.CHAIN_APPROX_NONE)
 
     height, width, depth = image.shape
 
@@ -29,7 +31,8 @@ def process_scan_leaf(scan_leaf_path, output_folder):
         cv2.grabCut(image, mask, rect, bgd_model, fgd_model, 5, cv2.GC_INIT_WITH_RECT)
         mask2 = np.where((mask == 2) | (mask == 0), 0, 1).astype('uint8')
         image = image * mask2[:, :, np.newaxis]
-        print('[leafscan] ' + leaf_picture_name + ' a fost procesata de leaf scan complex')
+        print(
+            '[leafscan] ' + leaf_picture_name + ' a fost procesata de leaf scan complex')
 
     image = crop_image(image, height, width)
     cv2.imwrite(os.path.join(output_folder, leaf_picture_name), image)
@@ -59,7 +62,9 @@ def crop_image(image, height, width):
                 elif j > right:
                     right = j
 
-    print "[crop] Top: %s Bottom: %s Left: %s Right: %s" % (top, bottom, left, right)
+    print('[crop] Top: {} Bottom: {} Left: {} Right: {}'.format(
+        top, bottom, left, right
+    ))
 
     image = image[top:bottom, left:right]
 
