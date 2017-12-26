@@ -1,144 +1,49 @@
-from os import listdir, path, remove
-import sqlite3 as sqlite
+from os import listdir, path
 import xml.etree.ElementTree as ET
 import matplotlib.pyplot as plt
 import pickle
+import shutil
 
 
-def generate_train_data():
+def generate_data(learning_type='train'):
+    '''
+    `learning_type` must be one of `test` or `train`
+    '''
+    if learning_type not in ['train', 'test']:
+        raise ValueError
+
     dirpath = path.dirname(path.abspath(__file__))
     current_file_list = listdir(dirpath)
 
-    files_list = listdir(path.join(dirpath, 'train/'))
-
+    files_list = listdir(path.join(dirpath, learning_type))
+    print(len(files_list))
     all_img_ids = set([
         im_file.split('.')[0]
         for im_file in files_list
     ])
 
-
-    # build one connection to db file
-    con = sqlite.connect('imgs.db')
-    c = con.cursor()
-    c.execute(
-        'drop table if exists train_img'
-    )
-    print('creating table...')
-    c.execute(
-        '''
-        create table train_img(
-            id INTEGER PRIMARY KEY not null,
-            img,
-            class_id INTEGER,
-            content STRING,
-            family STRING,
-            genus STRING,
-            species STRING,
-            author STRING
-        );
-        '''
-    )
-    print('table {} has been created'.format('train_img'))
+    LeafScan_dict = {}
 
     for img_id in all_img_ids:
         img_info = _parse_xml(
-            './train/' + img_id + '.xml'
+            path.join(dirpath, learning_type, img_id+'.xml')
         )
-        img_rgb = plt.imread('./train/' + img_id + '.jpg').astype('float')
 
-        if img_info['Content'] != 'Flower':
-            # print('Img {} is not belong to \'Flower\''.format(img_id))
-            continue
+        if img_info['Content'] == 'LeafScan':
+            if not LeafScan_dict.get(img_info['Family']):
+                LeafScan_dict[img_info['Family']] = [img_id]
+            else:
+                LeafScan_dict[img_info['Family']].append(img_id)
 
-        c.execute(
-            '''
-            insert into train_img
-            (id, img, class_id, content, family, genus, species, author)
-            values
-            (?, ?, ?, ?, ?, ?, ?, ?)
-            ''',
-            (
-                int(img_info['MediaId']),
-                pickle.dumps(img_rgb),
-                int(img_info['ClassId']),
-                img_info['Content'],
-                img_info['Family'],
-                img_info['Genus'],
-                img_info['Species'],
-                img_info['Author']
-            )
-        )
-        print('Inserting the image: {}'.format(img_id))
-    con.commit()
-    con.close()
-
-
-def generate_test_data():
-    dirpath = path.dirname(path.abspath(__file__))
-    current_file_list = listdir(dirpath)
-
-    files_list = listdir(path.join(dirpath, 'test/'))
-
-    all_img_ids = set([
-        im_file.split('.')[0]
-        for im_file in files_list
-    ])
-
-
-    # build one connection to db file
-    con = sqlite.connect('imgs.db')
-    c = con.cursor()
-    c.execute(
-        'drop table if exists test_img'
+    if path.exists(path.join(dirpath, learning_type + '.pickle')):
+        print('File has exists!')
+        return
+    pickle.dump(
+        LeafScan_dict,
+        open(path.join(dirpath, learning_type + '.pickle'), 'wb')
     )
-    print('creating table...')
-    c.execute(
-        '''
-        create table test_img(
-            id INTEGER PRIMARY KEY not null,
-            img,
-            class_id INTEGER,
-            content STRING,
-            family STRING,
-            genus STRING,
-            species STRING,
-            author STRING
-        );
-        '''
-    )
-    print('table {} has been created'.format('test_img'))
 
-    for img_id in all_img_ids:
-        img_info = _parse_xml(
-            './test/' + img_id + '.xml'
-        )
-        img_rgb = plt.imread('./test/' + img_id + '.jpg').astype('float')
-
-        if img_info['Content'] is not 'Flower':
-            # print('Img {} is not belong to \'Flower\''.format(img_id))
-            continue
-
-        c.execute(
-            '''
-            insert into test_img
-            (id, img, class_id, content, family, genus, species, author)
-            values
-            (?, ?, ?, ?, ?, ?, ?, ?)
-            ''',
-            (
-                int(img_info['MediaId']),
-                pickle.dumps(img_rgb),
-                int(img_info['ClassId']),
-                img_info['Content'],
-                img_info['Family'],
-                img_info['Genus'],
-                img_info['Species'],
-                img_info['Author']
-            )
-        )
-        print('Inserting the image: {}'.format(img_id))
-    con.commit()
-    con.close()
+    return
 
 
 def _parse_xml(xml_file):
@@ -156,5 +61,5 @@ def _parse_xml(xml_file):
 
 
 if __name__ == '__main__':
-    generate_train_data()
-    generate_test_data()
+    generate_data()
+    generate_data(learning_type='test')
