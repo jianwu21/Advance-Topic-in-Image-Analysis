@@ -10,13 +10,19 @@ def generate_data(learning_type='train'):
     `learning_type` must be one of `test` or `train`
     '''
     if learning_type not in ['train', 'test']:
-        raise ValueError
+        raise ValueError(
+            '\'learning_type\' can be only one of [\'train\', \'test\']')
 
     dirpath = path.dirname(path.abspath(__file__))
+
+    if path.exists(path.join(dirpath, learning_type + '.pickle')):
+        print('File {} exists!'.format(learning_type + '.pickle'))
+        return
+
     current_file_list = listdir(dirpath)
 
     files_list = listdir(path.join(dirpath, learning_type))
-    print(len(files_list))
+
     all_img_ids = set([
         im_file.split('.')[0]
         for im_file in files_list
@@ -35,9 +41,6 @@ def generate_data(learning_type='train'):
             else:
                 LeafScan_dict[img_info['Family']].append(img_id)
 
-    if path.exists(path.join(dirpath, learning_type + '.pickle')):
-        print('File has exists!')
-        return
     pickle.dump(
         LeafScan_dict,
         open(path.join(dirpath, learning_type + '.pickle'), 'wb')
