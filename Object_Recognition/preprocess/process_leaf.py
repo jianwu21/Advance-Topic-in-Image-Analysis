@@ -3,6 +3,7 @@ from __future__ import absolute_import, division, print_function
 import numpy as np
 import cv2
 import os
+import matplotlib.pyplot as plt
 
 
 def process_scan_leaf(scan_leaf_path, output_folder):
@@ -35,6 +36,9 @@ def process_scan_leaf(scan_leaf_path, output_folder):
             '[leafscan] ' + leaf_picture_name + ' a fost procesata de leaf scan complex')
 
     image = crop_image(image, height, width)
+
+    if not os.path.exists(output_folder):
+        os.mkdir(output_folder)
     cv2.imwrite(os.path.join(output_folder, leaf_picture_name), image)
 
 
