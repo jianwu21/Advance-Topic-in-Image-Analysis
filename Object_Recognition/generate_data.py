@@ -36,10 +36,7 @@ def generate_data(learning_type='train'):
         )
 
         if img_info['Content'] == 'LeafScan':
-            if not LeafScan_dict.get(img_info['Family']):
-                LeafScan_dict[img_info['Family']] = [img_id]
-            else:
-                LeafScan_dict[img_info['Family']].append(img_id)
+            LeafScan_dict[img_id] = img_info['Family']
 
     pickle.dump(
         LeafScan_dict,
@@ -66,3 +63,13 @@ def _parse_xml(xml_file):
 if __name__ == '__main__':
     generate_data()
     generate_data(learning_type='test')
+
+    leafscan_dict = pickle.load(open('./train.pickle', 'rb'))
+    all_classes = list(set(leafscan_dict.values()))
+    label_dict = dict(zip(all_classes, range(len(all_classes))))
+    print(label_dict)
+
+    pickle.dump(
+        label_dict,
+        open('./label_dict.pickle', 'wb')
+    )
