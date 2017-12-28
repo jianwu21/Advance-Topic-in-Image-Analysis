@@ -1,89 +1,223 @@
 from __future__ import absolute_import, division, print_function
 
 import numpy as np
+import pickle
+import cv2
+
 import keras
-import tensorflow as tf
+from keras.preprocessing.image import ImageDataGenerator
+from keras.models import Sequential
+from keras.layers import (
+    Dense, Dropout, Activation, Flatten, Conv2D, MaxPooling2D,
+    GlobalAveragePooling2D, AveragePooling2D
+)
+from keras import optimizers
+from keras.initializers import RandomNormal
+from keras.callbacks import LearningRateScheduler, TensorBoard
+from keras.layers.normalization import BatchNormalization
 
-tf.logging.set_verbosity(tf.logging.INFO)
-
-
-def weight_variable(shape):
-    initial = tf.truncated_normal(shape, stddev=0.1)
-    return tf.Variable(initial, name="W")
-
-
-def bias_variable(shape):
-    initial = tf.constant(0.1, shape=shape)
-    return tf.Variable(initial, name="bias")
-
-
-def conv2d(x, W):
-    return tf.nn.conv2d(x, W, strides=[1,1,1,1], padding="SAME", name="conv2d")
-
-
-def max_pool(x):
-    return tf.nn.max_pool(
-        x,
-        ksize=[1, 2, 2, 1],
-        strides=[1, 2, 2, 1],
-        padding="SAME",
-        name="pooled")
+batch_size    = 128
+epochs        = 200
+iterations    = 391
+num_classes   = 87
+dropout       = 0.5
+weight_decay  = 0.0001
+log_filepath  = './cnn'
 
 
-def cnn_model(feature, model):
-    '''
-    This is convolutional layers model
-    '''
-    # RGB image
-    input_layers = tf.reshape(feature, [-1, 500, 500, 3])
+'''
+def color_preprocessing(x_train,x_test):
+    x_train = x_train.astype('float32')
+    x_test = x_test.astype('float32')
+    mean = [125.307, 122.95, 113.865]
+    std  = [62.9932, 62.0887, 66.7048]
+    for i in range(3):
+        x_train[:,:,:,i] = (x_train[:,:,:,i] - mean[i]) / std[i]
+        x_test[:,:,:,i] = (x_test[:,:,:,i] - mean[i]) / std[i]
 
-    xs = tf.placeholder(tf.float32, [None, 500, 500, 3])
-    ys = tf.placeholder(tf.float32, [None, 87])
-    keep_prob = tf.placeholder(tf.float32)
-
-    # conv_1 layer
-    with tf.name_scope('conv-layer-1'):
-        W_conv1 = weight_variable([5, 5, 3, 16]) # outsize=32 :  convolutions units
-        b_conv1 = bias_variable([16])
-        h_conv1 = tf.nn.relu(conv2d(xs, W_conv1) + b_conv1) # 100 * 100 * 32
-        h_pooled_1 = max_pool(h_conv1) # 50 * 50 * 32
-
-    # conv_2 layer
-    with tf.name_scope('conv-layer-2'):
-        W_conv2 = weight_variable([5,5,16,8]) # outsize=64
-        b_conv2 = bias_variable([8])
-        h_conv2 = tf.nn.relu(conv2d(h_pooled_1, W_conv2) + b_conv2) # 25 * 25 *64
-        h_pooled_2 = max_pool(h_conv2) # 25 * 25 * 64
-
-    # cnv_3 layer
-    with tf.name_scope('conv-layer-3'):
-        W_conv3 = weight_variable([25, 25, 8, 8]) # outsize=64
-        b_conv3 = bias_variable([8])
-        h_conv3 = tf.nn.relu(conv2d(h_pooled_2, W_conv3) + b_conv3) # 25 * 25 *64
-        h_pooled_3 = max_pool(h_conv3) # 25 * 25 * 64
-
-    # func1 layer
-    with tf.name_scope('nn-layer-1'):
-        W_fun1 = weight_variable([25*25*8, 1024])
-        b_fun1 = bias_variable([1024])
-        h_pool2_flat = tf.reshape(h_pooled_3, [-1, 25*25*8])
-        h_fun2 = tf.nn.relu(tf.matmul(h_pool2_flat, W_fun1) + b_fun1)
-        h_fun2_drop = tf.nn.dropout(h_fun2, keep_prob)
+    return x_train, x_test
+'''
 
 
-    # func2 layer
-    with tf.name_scope('nn-layer-2'):
-        W_fun2 = weight_variable([1024, 87])
-        b_fun2 = bias_variable([87])
+def scheduler(epoch):
+    if epoch <= 80:
+        return 0.01
+    if epoch <= 140:
+        return 0.005
+    return 0.001
 
-    cross_entropy = -tf.reduce_sum(y_ * tf.log(y_conv))
-    train_step = tf.train.AdamOptimizer(1e-4).minimize(cross_entropy)
 
-    correct_prediction = tf.equal(tf.arg_max(y_conv, 1), tf.arg_max(y_, 1))
-    accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
+def build_model():
+    model = Sequential()
 
-    sess.run(tf.initialize_all_variables())
+    model.add(
+    Conv2D(
+      192,
+      (5, 5),
+      padding='same',
+      kernel_regularizer=keras.regularizers.l2(weight_decay),
+      kernel_initializer="he_normal",
+      input_shape=x_train.shape[1:]
+    )
+    )
+    model.add(Activation('relu'))
+    model.add(
+    Conv2D(
+      160,
+      (1, 1),
+      padding='same',
+      kernel_regularizer=keras.regularizers.l2(weight_decay),
+      kernel_initializer="he_normal"
+    )
+    )
+    model.add(Activation('relu'))
+    model.add(
+    Conv2D(
+      96,
+      (1, 1),
+      padding='same',
+      kernel_regularizer=keras.regularizers.l2(weight_decay),
+      kernel_initializer="he_normal"
+    )
+    )
+    model.add(Activation('relu'))
+    model.add(MaxPooling2D(pool_size=(3, 3),strides=(2,2),padding = 'same'))
 
+    model.add(Dropout(dropout))
+
+    model.add(
+        Conv2D(
+            192,
+            (5, 5),
+            padding='same',
+            kernel_regularizer=keras.regularizers.l2(weight_decay),
+            kernel_initializer="he_normal"))
+    model.add(Activation('relu'))
+    model.add(
+        Conv2D(
+            192,
+            (1, 1),
+            padding='same',
+            kernel_regularizer=keras.regularizers.l2(weight_decay),
+            kernel_initializer="he_normal"))
+    model.add(Activation('relu'))
+    model.add(
+        Conv2D(
+            192,
+            (1, 1),
+            padding='same',
+            kernel_regularizer=keras.regularizers.l2(weight_decay),
+            kernel_initializer="he_normal"))
+    model.add(Activation('relu'))
+    model.add(MaxPooling2D(pool_size=(3, 3),strides=(2,2),padding = 'same'))
+
+    model.add(Dropout(dropout))
+
+    model.add(
+        Conv2D(
+            192,
+            (3, 3),
+            padding='same',
+            kernel_regularizer=keras.regularizers.l2(weight_decay),
+            kernel_initializer="he_normal"))
+    model.add(Activation('relu'))
+    model.add(
+        Conv2D(
+            192,
+            (1, 1),
+            padding='same',
+            kernel_regularizer=keras.regularizers.l2(weight_decay),
+            kernel_initializer="he_normal"))
+    model.add(Activation('relu'))
+    model.add(
+        Conv2D(
+            10,
+            (1, 1),
+            padding='same',
+            kernel_regularizer=keras.regularizers.l2(weight_decay),
+            kernel_initializer="he_normal"))
+    model.add(Activation('relu'))
+
+    model.add(GlobalAveragePooling2D())
+    model.add(Activation('softmax'))
+
+    sgd = optimizers.SGD(lr=.1, momentum=0.9, nesterov=True)
+    model.compile(
+        loss='categorical_crossentropy',
+        optimizer=sgd,
+        metrics=['accuracy'])
+
+    return model
 
 if __name__ == '__main__':
-    tf.app.run()
+    # load the pickle file
+    train_ids = pickle.load(open('../train.pickle', 'rb'))
+    test_ids = pickle.load(open('../test.pickle', 'rb'))
+    label_dict = pickle.load(open('../label_dict.pickle', 'rb'))
+
+    all_training_ims = train_ids.keys()
+    all_testing_ims = test_ids.keys()
+
+    # load data
+    x_train = []
+    y_train = []
+
+    for im_id in all_training_ims[:100]:
+        image = cv2.imread('./process_train/' + im_id + '.jpg')
+        try:
+            im = cv2.resize(image, (300, 300))
+            x_train.append(im)
+            y_train.append(label_dict[leafscan_dict[im_id]])
+        except:
+            continue
+
+    x_test = []
+    y_test = []
+
+    for im_id in all_testing_ims:
+        image = cv2.imread('./process_test/' + im_id + '.jpg')
+        try:
+            im = cv2.resize(image, (300, 300))
+            x_test.append(im)
+            y_test.append(label_dict[leafscan_dict[im_id]])
+        except:
+            continue
+
+    x_train = np.array(x_train)
+    x_test = np.array(x_test)
+
+    y_train = keras.utils.to_categorical(y_train, num_classes)
+    y_test = keras.utils.to_categorical(y_test, num_classes)
+
+    # build network
+    model = build_model()
+    print(model.summary())
+
+    # set callback
+    tb_cb = TensorBoard(log_dir=log_filepath, histogram_freq=0)
+    change_lr = LearningRateScheduler(scheduler)
+    cbks = [change_lr,tb_cb]
+
+    # set data augmentation
+    print('Using real-time data augmentation.')
+    datagen = ImageDataGenerator(
+        horizontal_flip=True,
+        width_shift_range=0.125,
+        height_shift_range=0.125,
+        fill_mode='constant',
+        cval=0.)
+    datagen.fit(x_train)
+
+    # start training
+    model.fit_generator(
+        datagen.flow(
+            x_train,
+            y_train,
+            batch_size=batch_size
+        ),
+        steps_per_epoch=iterations,
+        epochs=epochs,
+        callbacks=cbks,
+        validation_data=(x_test, y_test),
+    )
+    model.save('nin.h5')
