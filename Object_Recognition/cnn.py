@@ -20,7 +20,7 @@ batch_size    = 128
 epochs        = 200
 iterations    = 391
 num_classes   = 87
-dropout       = 0.5
+dropout       = 0.25
 weight_decay  = 0.0001
 log_filepath  = './cnn'
 
@@ -48,95 +48,61 @@ def scheduler(epoch):
 
 
 def build_model():
+    # build the network
     model = Sequential()
 
     model.add(
-    Conv2D(
-      192,
-      (5, 5),
-      padding='same',
-      kernel_regularizer=keras.regularizers.l2(weight_decay),
-      kernel_initializer="he_normal",
-      input_shape=x_train.shape[1:]
-    )
-    )
-    model.add(Activation('relu'))
-    model.add(
-    Conv2D(
-      160,
-      (1, 1),
-      padding='same',
-      kernel_regularizer=keras.regularizers.l2(weight_decay),
-      kernel_initializer="he_normal"
-    )
-    )
-    model.add(Activation('relu'))
-    model.add(
-    Conv2D(
-      96,
-      (1, 1),
-      padding='same',
-      kernel_regularizer=keras.regularizers.l2(weight_decay),
-      kernel_initializer="he_normal"
-    )
-    )
-    model.add(Activation('relu'))
-    model.add(MaxPooling2D(pool_size=(3, 3),strides=(2,2),padding = 'same'))
-
-    model.add(Dropout(dropout))
-
-    model.add(
         Conv2D(
-            192,
-            (5, 5),
+            32,
+            (10, 10),
             padding='same',
             kernel_regularizer=keras.regularizers.l2(weight_decay),
-            kernel_initializer="he_normal"))
+            kernel_initializer="he_normal",
+            input_shape=(300, 300, 3)
+        )
+    )
     model.add(Activation('relu'))
     model.add(
         Conv2D(
-            192,
-            (1, 1),
-            padding='same',
-            kernel_regularizer=keras.regularizers.l2(weight_decay),
-            kernel_initializer="he_normal"))
-    model.add(Activation('relu'))
-    model.add(
-        Conv2D(
-            192,
-            (1, 1),
-            padding='same',
-            kernel_regularizer=keras.regularizers.l2(weight_decay),
-            kernel_initializer="he_normal"))
-    model.add(Activation('relu'))
-    model.add(MaxPooling2D(pool_size=(3, 3),strides=(2,2),padding = 'same'))
-
-    model.add(Dropout(dropout))
-
-    model.add(
-        Conv2D(
-            192,
+            32,
             (3, 3),
             padding='same',
             kernel_regularizer=keras.regularizers.l2(weight_decay),
-            kernel_initializer="he_normal"))
+            kernel_initializer="he_normal"
+        )
+    )
     model.add(Activation('relu'))
+    model.add(MaxPooling2D(pool_size=(2, 2),strides=(2,2),padding = 'same'))
+
+    model.add(Dropout(dropout))
+
     model.add(
         Conv2D(
-            192,
-            (1, 1),
+            64,
+            (10, 10),
             padding='same',
             kernel_regularizer=keras.regularizers.l2(weight_decay),
             kernel_initializer="he_normal"))
     model.add(Activation('relu'))
     model.add(
         Conv2D(
-            10,
-            (1, 1),
+            64,
+            (10, 10),
             padding='same',
             kernel_regularizer=keras.regularizers.l2(weight_decay),
             kernel_initializer="he_normal"))
     model.add(Activation('relu'))
+    model.add(
+        Conv2D(
+            64,
+            (10, 10),
+            padding='same',
+            kernel_regularizer=keras.regularizers.l2(weight_decay),
+            kernel_initializer="he_normal"))
+    model.add(Activation('relu'))
+    model.add(MaxPooling2D(pool_size=(2, 2),strides=(2,2),padding = 'same'))
+
+    model.add(Dropout(dropout))
 
     model.add(GlobalAveragePooling2D())
     model.add(Activation('softmax'))
@@ -151,12 +117,12 @@ def build_model():
 
 if __name__ == '__main__':
     # load the pickle file
-    train_ids = pickle.load(open('../train.pickle', 'rb'))
-    test_ids = pickle.load(open('../test.pickle', 'rb'))
-    label_dict = pickle.load(open('../label_dict.pickle', 'rb'))
+    train_dict = pickle.load(open('./train.pickle', 'rb'))
+    test_dict = pickle.load(open('./test.pickle', 'rb'))
+    label_dict = pickle.load(open('./label_dict.pickle', 'rb'))
 
-    all_training_ims = train_ids.keys()
-    all_testing_ims = test_ids.keys()
+    all_training_ims = train_dict.keys()
+    all_testing_ims = test_dict.keys()
 
     # load data
     x_train = []
@@ -167,10 +133,10 @@ if __name__ == '__main__':
         try:
             im = cv2.resize(image, (300, 300))
             x_train.append(im)
-            y_train.append(label_dict[leafscan_dict[im_id]])
+            y_train.append(label_dict[train_dict[im_id]])
         except:
             continue
-
+    print(len(x_train))
     x_test = []
     y_test = []
 
@@ -179,9 +145,11 @@ if __name__ == '__main__':
         try:
             im = cv2.resize(image, (300, 300))
             x_test.append(im)
-            y_test.append(label_dict[leafscan_dict[im_id]])
+            y_test.append(label_dict[test_dict[im_id]])
         except:
             continue
+
+    print('{} samples will be trained'.format(len(y_train)))
 
     x_train = np.array(x_train)
     x_test = np.array(x_test)
@@ -201,11 +169,20 @@ if __name__ == '__main__':
     # set data augmentation
     print('Using real-time data augmentation.')
     datagen = ImageDataGenerator(
-        horizontal_flip=True,
-        width_shift_range=0.125,
-        height_shift_range=0.125,
-        fill_mode='constant',
-        cval=0.)
+        featurewise_center=False,  # set input mean to 0 over the dataset
+        samplewise_center=False,  # set each sample mean to 0
+        featurewise_std_normalization=False,  # divide inputs by std of the dataset
+        samplewise_std_normalization=False,  # divide each input by its std
+        zca_whitening=False,  # apply ZCA whitening
+        rotation_range=0,  # randomly rotate images in the range (degrees, 0 to 180)
+        width_shift_range=0.1,  # randomly shift images horizontally (fraction of total width)
+        height_shift_range=0.1,  # randomly shift images vertically (fraction of total height)
+        horizontal_flip=True,  # randomly flip images
+        vertical_flip=False)  # randomly flip images
+
+    # Compute quantities required for feature-wise normalization
+    # (std, mean, and principal components if ZCA whitening is applied).
+    print(x_train.shape)
     datagen.fit(x_train)
 
     # start training
