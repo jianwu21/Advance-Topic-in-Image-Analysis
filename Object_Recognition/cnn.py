@@ -16,33 +16,19 @@ from keras.initializers import RandomNormal
 from keras.callbacks import LearningRateScheduler, TensorBoard
 from keras.layers.normalization import BatchNormalization
 
-batch_size    = 128
-epochs        = 200
-iterations    = 391
+batch_size    = 200
+epochs        = 100
+iterations    = 100
 num_classes   = 87
 dropout       = 0.25
 weight_decay  = 0.0001
 log_filepath  = './cnn'
 
 
-'''
-def color_preprocessing(x_train,x_test):
-    x_train = x_train.astype('float32')
-    x_test = x_test.astype('float32')
-    mean = [125.307, 122.95, 113.865]
-    std  = [62.9932, 62.0887, 66.7048]
-    for i in range(3):
-        x_train[:,:,:,i] = (x_train[:,:,:,i] - mean[i]) / std[i]
-        x_test[:,:,:,i] = (x_test[:,:,:,i] - mean[i]) / std[i]
-
-    return x_train, x_test
-'''
-
-
 def scheduler(epoch):
-    if epoch <= 80:
+    if epoch <= 30:
         return 0.01
-    if epoch <= 140:
+    if epoch <= 60:
         return 0.005
     return 0.001
 
@@ -54,11 +40,11 @@ def build_model():
     model.add(
         Conv2D(
             32,
-            (10, 10),
+            (3, 3),
             padding='same',
             kernel_regularizer=keras.regularizers.l2(weight_decay),
             kernel_initializer="he_normal",
-            input_shape=(300, 300, 3)
+            input_shape=x_train.shape[1:]
         )
     )
     model.add(Activation('relu'))
@@ -79,7 +65,7 @@ def build_model():
     model.add(
         Conv2D(
             64,
-            (10, 10),
+            (3, 3),
             padding='same',
             kernel_regularizer=keras.regularizers.l2(weight_decay),
             kernel_initializer="he_normal"))
@@ -87,15 +73,25 @@ def build_model():
     model.add(
         Conv2D(
             64,
-            (10, 10),
+            (3, 3),
+            padding='same',
+            kernel_regularizer=keras.regularizers.l2(weight_decay),
+            kernel_initializer="he_normal"))
+    model.add(Activation('relu'))
+    model.add(MaxPooling2D(pool_size=(2, 2),strides=(2,2),padding = 'same'))
+
+    model.add(
+        Conv2D(
+            128,
+            (3, 3),
             padding='same',
             kernel_regularizer=keras.regularizers.l2(weight_decay),
             kernel_initializer="he_normal"))
     model.add(Activation('relu'))
     model.add(
         Conv2D(
-            64,
-            (10, 10),
+            128,
+            (3, 3),
             padding='same',
             kernel_regularizer=keras.regularizers.l2(weight_decay),
             kernel_initializer="he_normal"))
@@ -104,13 +100,19 @@ def build_model():
 
     model.add(Dropout(dropout))
 
-    model.add(GlobalAveragePooling2D())
+    model.add(Flatten())
+    model.add(Dense(512))
+    model.add(Activation('relu'))
+    model.add(Dropout(0.5))
+    model.add(Dense(num_classes))
     model.add(Activation('softmax'))
+    # initiate RMSprop optimizer
+    opt = keras.optimizers.rmsprop(lr=0.0001, decay=1e-6)
 
-    sgd = optimizers.SGD(lr=.1, momentum=0.9, nesterov=True)
+    # Let's train the model using RMSprop
     model.compile(
         loss='categorical_crossentropy',
-        optimizer=sgd,
+        optimizer=opt,
         metrics=['accuracy'])
 
     return model
@@ -131,7 +133,7 @@ if __name__ == '__main__':
     for im_id in all_training_ims[:100]:
         image = cv2.imread('./process_train/' + im_id + '.jpg')
         try:
-            im = cv2.resize(image, (300, 300))
+            im = cv2.resize(image, (100, 100))
             x_train.append(im)
             y_train.append(label_dict[train_dict[im_id]])
         except:
@@ -143,7 +145,7 @@ if __name__ == '__main__':
     for im_id in all_testing_ims:
         image = cv2.imread('./process_test/' + im_id + '.jpg')
         try:
-            im = cv2.resize(image, (300, 300))
+            im = cv2.resize(image, (100, 100))
             x_test.append(im)
             y_test.append(label_dict[test_dict[im_id]])
         except:
