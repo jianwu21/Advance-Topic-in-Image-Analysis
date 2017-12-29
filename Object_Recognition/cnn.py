@@ -16,7 +16,7 @@ from keras.initializers import RandomNormal
 from keras.callbacks import LearningRateScheduler, TensorBoard
 from keras.layers.normalization import BatchNormalization
 
-batch_size    = 200
+batch_size    = 1000
 epochs        = 100
 iterations    = 100
 num_classes   = 87
@@ -27,10 +27,10 @@ log_filepath  = './cnn'
 
 def scheduler(epoch):
     if epoch <= 30:
-        return 0.01
+        return 0.1
     if epoch <= 60:
-        return 0.005
-    return 0.001
+        return 0.05
+    return 0.01
 
 
 def build_model():
@@ -39,22 +39,12 @@ def build_model():
 
     model.add(
         Conv2D(
-            32,
+            192,
             (3, 3),
             padding='same',
             kernel_regularizer=keras.regularizers.l2(weight_decay),
             kernel_initializer="he_normal",
             input_shape=x_train.shape[1:]
-        )
-    )
-    model.add(Activation('relu'))
-    model.add(
-        Conv2D(
-            32,
-            (3, 3),
-            padding='same',
-            kernel_regularizer=keras.regularizers.l2(weight_decay),
-            kernel_initializer="he_normal"
         )
     )
     model.add(Activation('relu'))
@@ -64,15 +54,7 @@ def build_model():
 
     model.add(
         Conv2D(
-            64,
-            (3, 3),
-            padding='same',
-            kernel_regularizer=keras.regularizers.l2(weight_decay),
-            kernel_initializer="he_normal"))
-    model.add(Activation('relu'))
-    model.add(
-        Conv2D(
-            64,
+            512,
             (3, 3),
             padding='same',
             kernel_regularizer=keras.regularizers.l2(weight_decay),
@@ -80,9 +62,11 @@ def build_model():
     model.add(Activation('relu'))
     model.add(MaxPooling2D(pool_size=(2, 2),strides=(2,2),padding = 'same'))
 
+    model.add(Dropout(dropout))
+
     model.add(
         Conv2D(
-            128,
+            768,
             (3, 3),
             padding='same',
             kernel_regularizer=keras.regularizers.l2(weight_decay),
@@ -90,7 +74,15 @@ def build_model():
     model.add(Activation('relu'))
     model.add(
         Conv2D(
-            128,
+            768,
+            (3, 3),
+            padding='same',
+            kernel_regularizer=keras.regularizers.l2(weight_decay),
+            kernel_initializer="he_normal"))
+    model.add(Activation('relu'))
+    model.add(
+        Conv2D(
+            768,
             (3, 3),
             padding='same',
             kernel_regularizer=keras.regularizers.l2(weight_decay),
@@ -130,7 +122,7 @@ if __name__ == '__main__':
     x_train = []
     y_train = []
 
-    for im_id in all_training_ims[:100]:
+    for im_id in all_training_ims:
         image = cv2.imread('./process_train/' + im_id + '.jpg')
         try:
             im = cv2.resize(image, (100, 100))
