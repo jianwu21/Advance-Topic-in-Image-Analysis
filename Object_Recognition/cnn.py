@@ -27,10 +27,10 @@ log_filepath  = './log'
 
 def scheduler(epoch):
     if epoch <= 30:
-        return 0.1
+        return 0.01
     if epoch <= 60:
-        return 0.05
-    return 0.01
+        return 0.005
+    return 0.001
 
 
 def build_model():
