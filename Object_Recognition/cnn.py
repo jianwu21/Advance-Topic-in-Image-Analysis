@@ -22,7 +22,7 @@ iterations    = 100
 num_classes   = 87
 dropout       = 0.25
 weight_decay  = 0.0001
-log_filepath  = './cnn'
+log_filepath  = './log'
 
 
 def scheduler(epoch):
@@ -39,7 +39,7 @@ def build_model():
 
     model.add(
         Conv2D(
-            192,
+            64,
             (3, 3),
             padding='same',
             kernel_regularizer=keras.regularizers.l2(weight_decay),
@@ -54,7 +54,7 @@ def build_model():
 
     model.add(
         Conv2D(
-            512,
+            128,
             (3, 3),
             padding='same',
             kernel_regularizer=keras.regularizers.l2(weight_decay),
@@ -66,7 +66,7 @@ def build_model():
 
     model.add(
         Conv2D(
-            768,
+            256,
             (3, 3),
             padding='same',
             kernel_regularizer=keras.regularizers.l2(weight_decay),
@@ -74,7 +74,7 @@ def build_model():
     model.add(Activation('relu'))
     model.add(
         Conv2D(
-            768,
+            256,
             (3, 3),
             padding='same',
             kernel_regularizer=keras.regularizers.l2(weight_decay),
@@ -82,7 +82,7 @@ def build_model():
     model.add(Activation('relu'))
     model.add(
         Conv2D(
-            768,
+            256,
             (3, 3),
             padding='same',
             kernel_regularizer=keras.regularizers.l2(weight_decay),
