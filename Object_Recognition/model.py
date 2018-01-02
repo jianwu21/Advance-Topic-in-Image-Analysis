@@ -22,7 +22,7 @@ iterations    = 100
 num_classes   = 87
 dropout       = 0.25
 weight_decay  = 0.0001
-log_filepath  = './log'
+log_filepath  = './logs'
 
 
 def scheduler(epoch):
@@ -173,7 +173,8 @@ if __name__ == '__main__':
         width_shift_range=0.1,  # randomly shift images horizontally (fraction of total width)
         height_shift_range=0.1,  # randomly shift images vertically (fraction of total height)
         horizontal_flip=True,  # randomly flip images
-        vertical_flip=False)  # randomly flip images
+        vertical_flip=True, # randomly flip images
+    )
 
     # Compute quantities required for feature-wise normalization
     # (std, mean, and principal components if ZCA whitening is applied).
@@ -192,4 +193,4 @@ if __name__ == '__main__':
         callbacks=cbks,
         validation_data=(x_test, y_test),
     )
-    model.save('nin.h5')
+    model.save('model.h5')
