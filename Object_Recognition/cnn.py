@@ -16,7 +16,7 @@ from keras.initializers import RandomNormal
 from keras.callbacks import LearningRateScheduler, TensorBoard
 from keras.layers.normalization import BatchNormalization
 
-batch_size    = 1000
+batch_size    = 100
 epochs        = 100
 iterations    = 100
 num_classes   = 87
@@ -122,7 +122,8 @@ if __name__ == '__main__':
     x_train = []
     y_train = []
 
-    for im_id in all_training_ims:
+    # Using all the data for training.
+    for im_id in all_training_ims[:200]:
         image = cv2.imread('./process_train/' + im_id + '.jpg')
         try:
             im = cv2.resize(image, (100, 100))
@@ -168,7 +169,7 @@ if __name__ == '__main__':
         featurewise_std_normalization=False,  # divide inputs by std of the dataset
         samplewise_std_normalization=False,  # divide each input by its std
         zca_whitening=False,  # apply ZCA whitening
-        rotation_range=0,  # randomly rotate images in the range (degrees, 0 to 180)
+        rotation_range=180,  # randomly rotate images in the range (degrees, 0 to 180)
         width_shift_range=0.1,  # randomly shift images horizontally (fraction of total width)
         height_shift_range=0.1,  # randomly shift images vertically (fraction of total height)
         horizontal_flip=True,  # randomly flip images
