@@ -10,8 +10,9 @@ Segmenation
 Object Recognition
 ------------------
 
-The second part is one main task in computer vision, object recognition. There are three main methods for this task.
+The second part is one main task in computer vision, object recognition. There are three steps for this task
 
+- Segmentation and crop the main image for training.
 - [CNN](https://www.tensorflow.org/tutorials/layers)
-- 
+- [Keras](https://keras.io/)
 
