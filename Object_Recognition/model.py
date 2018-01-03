@@ -123,7 +123,7 @@ if __name__ == '__main__':
     y_train = []
 
     # Using all the data for training.
-    for im_id in all_training_ims[:200]:
+    for im_id in all_training_ims[:100]:
         image = cv2.imread('./process_train/' + im_id + '.jpg')
         try:
             im = cv2.resize(image, (100, 100))
@@ -166,7 +166,7 @@ if __name__ == '__main__':
     datagen = ImageDataGenerator(
         featurewise_center=False,  # set input mean to 0 over the dataset
         samplewise_center=False,  # set each sample mean to 0
-        featurewise_std_normalization=False,  # divide inputs by std of the dataset
+        featurewise_std_normalization=True,  # divide inputs by std of the dataset
         samplewise_std_normalization=False,  # divide each input by its std
         zca_whitening=False,  # apply ZCA whitening
         rotation_range=180,  # randomly rotate images in the range (degrees, 0 to 180)
