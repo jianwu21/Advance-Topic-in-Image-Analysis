@@ -16,8 +16,8 @@ from keras.initializers import RandomNormal
 from keras.callbacks import LearningRateScheduler, TensorBoard
 from keras.layers.normalization import BatchNormalization
 
-batch_size    = 100
-epochs        = 100
+batch_size    = 1000
+epochs        = 10
 iterations    = 100
 num_classes   = 87
 dropout       = 0.25
@@ -123,7 +123,7 @@ if __name__ == '__main__':
     y_train = []
 
     # Using all the data for training.
-    for im_id in all_training_ims[:100]:
+    for im_id in all_training_ims:
         image = cv2.imread('./process_train/' + im_id + '.jpg')
         try:
             im = cv2.resize(image, (100, 100))
