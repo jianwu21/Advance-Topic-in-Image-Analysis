@@ -131,7 +131,6 @@ if __name__ == '__main__':
             y_train.append(label_dict[train_dict[im_id]])
         except:
             continue
-    print(len(x_train))
     x_test = []
     y_test = []
 
