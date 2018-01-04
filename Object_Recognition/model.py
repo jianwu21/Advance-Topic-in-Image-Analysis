@@ -16,7 +16,7 @@ from keras.initializers import RandomNormal
 from keras.callbacks import LearningRateScheduler, TensorBoard
 from keras.layers.normalization import BatchNormalization
 
-batch_size    = 1000
+batch_size    = 32
 epochs        = 10
 iterations    = 100
 num_classes   = 87
@@ -137,7 +137,7 @@ if __name__ == '__main__':
     for im_id in all_testing_ims:
         image = cv2.imread('./process_test/' + im_id + '.jpg')
         try:
-            im = cv2.resize(image, (100, 100))
+            im = cv2.resize(image, (224, 224))
             x_test.append(im)
             y_test.append(label_dict[test_dict[im_id]])
         except:
