@@ -3,9 +3,12 @@ from __future__ import absolute_import, division, print_function
 import numpy as np
 import pickle
 import cv2
+import os
 
 import keras
-from keras.preprocessing.image import ImageDataGenerator
+from keras.preprocessing.image import (
+    ImageDataGenerator, load_img, img_to_array
+)
 from keras.models import Sequential
 from keras.layers import (
     Dense, Dropout, Activation, Flatten, Conv2D, MaxPooling2D,
@@ -31,6 +34,15 @@ def scheduler(epoch):
     if epoch <= 60:
         return 0.005
     return 0.001
+
+
+def check_logs():
+    if os.path.exists('./logs'):
+        if len(os.listdir('./logs')) == 0:
+            return
+        else:
+            os.remove('./logs/*')
+            return
 
 
 def build_model():
@@ -123,24 +135,32 @@ if __name__ == '__main__':
     y_train = []
 
     # Using all the data for training.
-    for im_id in all_training_ims:
-        image = cv2.imread('./process_train/' + im_id + '.jpg')
+    for im_id in all_training_ims[:200]:
         try:
-            im = cv2.resize(image, (100, 100))
+            im = img_to_array(
+                img=load_img(
+                    './process_train/' + im_id + '.jpg',
+                    target_size=(224, 224),
+                )
+            )
             x_train.append(im)
             y_train.append(label_dict[train_dict[im_id]])
-        except:
+        except IOError:
             continue
     x_test = []
     y_test = []
 
     for im_id in all_testing_ims:
-        image = cv2.imread('./process_test/' + im_id + '.jpg')
         try:
-            im = cv2.resize(image, (224, 224))
+            im = img_to_array(
+                img=load_img(
+                    './process_test/' + im_id + '.jpg',
+                    target_size=(224, 224),
+                )
+            )
             x_test.append(im)
             y_test.append(label_dict[test_dict[im_id]])
-        except:
+        except IOError:
             continue
 
     print('{} samples will be trained'.format(len(y_train)))
@@ -179,6 +199,9 @@ if __name__ == '__main__':
     # (std, mean, and principal components if ZCA whitening is applied).
     print(x_train.shape)
     datagen.fit(x_train)
+
+    # check_logs
+    check_logs()
 
     # start training
     model.fit_generator(
