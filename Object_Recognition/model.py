@@ -19,7 +19,7 @@ from keras.initializers import RandomNormal
 from keras.callbacks import LearningRateScheduler, TensorBoard
 from keras.layers.normalization import BatchNormalization
 
-batch_size    = 32
+batch_size    = 1000
 epochs        = 10
 iterations    = 100
 num_classes   = 87
