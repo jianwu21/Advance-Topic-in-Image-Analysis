@@ -4,6 +4,7 @@ import numpy as np
 import pickle
 import cv2
 import os
+import shutil
 
 import keras
 from keras.preprocessing.image import (
@@ -19,7 +20,7 @@ from keras.initializers import RandomNormal
 from keras.callbacks import LearningRateScheduler, TensorBoard
 from keras.layers.normalization import BatchNormalization
 
-batch_size    = 1000
+batch_size    = 100
 epochs        = 10
 iterations    = 100
 num_classes   = 87
@@ -41,7 +42,7 @@ def check_logs():
         if len(os.listdir('./logs')) == 0:
             return
         else:
-            os.remove('./logs/*')
+            shutil.rmtree('./logs/')
             return
 
 
@@ -92,9 +93,21 @@ def build_model():
             kernel_regularizer=keras.regularizers.l2(weight_decay),
             kernel_initializer="he_normal"))
     model.add(Activation('relu'))
+    model.add(MaxPooling2D(pool_size=(2, 2),strides=(2,2),padding = 'same'))
+
+    model.add(Dropout(dropout))
+
     model.add(
         Conv2D(
-            256,
+            512,
+            (3, 3),
+            padding='same',
+            kernel_regularizer=keras.regularizers.l2(weight_decay),
+            kernel_initializer="he_normal"))
+    model.add(Activation('relu'))
+    model.add(
+        Conv2D(
+            512,
             (3, 3),
             padding='same',
             kernel_regularizer=keras.regularizers.l2(weight_decay),
@@ -105,7 +118,7 @@ def build_model():
     model.add(Dropout(dropout))
 
     model.add(Flatten())
-    model.add(Dense(512))
+    model.add(Dense(1024))
     model.add(Activation('relu'))
     model.add(Dropout(0.5))
     model.add(Dense(num_classes))
@@ -135,7 +148,7 @@ if __name__ == '__main__':
     y_train = []
 
     # Using all the data for training.
-    for im_id in all_training_ims[:200]:
+    for im_id in all_training_ims[:1000]:
         try:
             im = img_to_array(
                 img=load_img(
