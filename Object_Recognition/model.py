@@ -52,7 +52,7 @@ def build_model():
 
     model.add(
         Conv2D(
-            64,
+            128,
             (3, 3),
             padding='same',
             kernel_regularizer=keras.regularizers.l2(weight_decay),
@@ -61,19 +61,7 @@ def build_model():
         )
     )
     model.add(Activation('relu'))
-    model.add(MaxPooling2D(pool_size=(2, 2),strides=(2,2),padding = 'same'))
-
-    model.add(Dropout(dropout))
-
-    model.add(
-        Conv2D(
-            128,
-            (3, 3),
-            padding='same',
-            kernel_regularizer=keras.regularizers.l2(weight_decay),
-            kernel_initializer="he_normal"))
-    model.add(Activation('relu'))
-    model.add(MaxPooling2D(pool_size=(2, 2),strides=(2,2),padding = 'same'))
+    model.add(MaxPooling2D(pool_size=(2, 2), strides=(2,2), padding = 'same'))
 
     model.add(Dropout(dropout))
 
@@ -85,15 +73,7 @@ def build_model():
             kernel_regularizer=keras.regularizers.l2(weight_decay),
             kernel_initializer="he_normal"))
     model.add(Activation('relu'))
-    model.add(
-        Conv2D(
-            256,
-            (3, 3),
-            padding='same',
-            kernel_regularizer=keras.regularizers.l2(weight_decay),
-            kernel_initializer="he_normal"))
-    model.add(Activation('relu'))
-    model.add(MaxPooling2D(pool_size=(2, 2),strides=(2,2),padding = 'same'))
+    model.add(MaxPooling2D(pool_size=(2, 2), strides=(2,2), padding = 'same'))
 
     model.add(Dropout(dropout))
 
@@ -113,7 +93,15 @@ def build_model():
             kernel_regularizer=keras.regularizers.l2(weight_decay),
             kernel_initializer="he_normal"))
     model.add(Activation('relu'))
-    model.add(MaxPooling2D(pool_size=(2, 2),strides=(2,2),padding = 'same'))
+    model.add(
+        Conv2D(
+            512,
+            (3, 3),
+            padding='same',
+            kernel_regularizer=keras.regularizers.l2(weight_decay),
+            kernel_initializer="he_normal"))
+    model.add(Activation('relu'))
+    model.add(MaxPooling2D(pool_size=(2, 2), strides=(2,2), padding = 'same'))
 
     model.add(Dropout(dropout))
 
