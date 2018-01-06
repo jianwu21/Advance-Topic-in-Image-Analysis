@@ -21,7 +21,7 @@ from keras.callbacks import LearningRateScheduler, TensorBoard
 from keras.layers.normalization import BatchNormalization
 
 batch_size    = 100
-epochs        = 10
+epochs        = 1
 iterations    = 100
 num_classes   = 87
 dropout       = 0.25
@@ -31,7 +31,7 @@ log_filepath  = './logs'
 
 def scheduler(epoch):
     if epoch <= 30:
-        return 0.01
+        return 0.001
     if epoch <= 60:
         return 0.005
     return 0.001
@@ -61,7 +61,7 @@ def build_model():
         )
     )
     model.add(Activation('relu'))
-    model.add(MaxPooling2D(pool_size=(2, 2), strides=(2,2), padding = 'same'))
+    model.add(MaxPooling2D(pool_size=(4, 4), strides=(4,4), padding = 'same'))
 
     model.add(Dropout(dropout))
 
@@ -136,13 +136,18 @@ if __name__ == '__main__':
 
     all_training_ims = train_dict.keys()
     all_testing_ims = test_dict.keys()
+    validation_ims = np.random.choice(
+        all_training_ims, len(all_training_ims)//5, replace=False)
 
     # load data
     x_train = []
     y_train = []
 
+    x_val = []
+    y_val = []
+
     # Using all the data for training.
-    for im_id in all_training_ims[:1000]:
+    for im_id in all_training_ims:
         try:
             im = img_to_array(
                 img=load_img(
@@ -150,10 +155,15 @@ if __name__ == '__main__':
                     target_size=(224, 224),
                 )
             )
-            x_train.append(im)
-            y_train.append(label_dict[train_dict[im_id]])
+            if im_id in validation_ims:
+                x_val.append(im)
+                y_val.append(label_dict[train_dict[im_id]])
+            else:
+                x_train.append(im)
+                y_train.append(label_dict[train_dict[im_id]])
         except IOError:
             continue
+
     x_test = []
     y_test = []
 
@@ -173,9 +183,11 @@ if __name__ == '__main__':
     print('{} samples will be trained'.format(len(y_train)))
 
     x_train = np.array(x_train)
+    x_val = np.array(x_val)
     x_test = np.array(x_test)
 
     y_train = keras.utils.to_categorical(y_train, num_classes)
+    y_val = keras.utils.to_categorical(y_val, num_classes)
     y_test = keras.utils.to_categorical(y_test, num_classes)
 
     # build network
@@ -220,6 +232,6 @@ if __name__ == '__main__':
         steps_per_epoch=iterations,
         epochs=epochs,
         callbacks=cbks,
-        validation_data=(x_test, y_test),
+        validation_data=(x_val, y_val),
     )
     model.save('model.h5')
