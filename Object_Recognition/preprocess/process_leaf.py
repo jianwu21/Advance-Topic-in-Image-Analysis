@@ -19,30 +19,26 @@ def process_scan_leaf(scan_leaf_path, output_folder):
 
     height, width, depth = image.shape
 
-    if len(contours) <= 50:
-        image = cv2.bitwise_and(image, image, mask=threshold)
-        print(
-            '[leafscan] ' + leaf_picture_name + ' a fost procesata de leaf scan simplu')
+    for i in range(height-1):
+        for j in range(width-1):
+            if contours[i, j] == 0:
+                image[i, j] = np.array([255, 255, 255])
 
-    else:
-        rect = (10, 10, width - 21, height - 21)
-        mask = np.zeros(image.shape[:2], np.uint8)
-        bgd_model = np.zeros((1, 65), np.float64)
-        fgd_model = np.zeros((1, 65), np.float64)
-        cv2.grabCut(image, mask, rect, bgd_model, fgd_model, 5, cv2.GC_INIT_WITH_RECT)
-        mask2 = np.where((mask == 2) | (mask == 0), 0, 1).astype('uint8')
-        image = image * mask2[:, :, np.newaxis]
-        print(
-            '[leafscan] ' + leaf_picture_name + ' a fost procesata de leaf scan complex')
+    print(
+        '[leafscan] ' + leaf_picture_name + \
+        ' a fost procesata de leaf scan complex')
 
-    image = crop_image(image, height, width)
+    image = crop_image(image)
 
     if not os.path.exists(output_folder):
         os.mkdir(output_folder)
     cv2.imwrite(os.path.join(output_folder, leaf_picture_name), image)
 
 
-def crop_image(image, height, width):
+def crop_image(image):
+    # set height and width
+    height, width = image.shape[:2]
+
     top = height - 1
     bottom = 0
     left = width - 1
@@ -55,7 +51,9 @@ def crop_image(image, height, width):
 
     for i in range(height):
         for j in range(width):
-            if image.item(i, j, 0) != 0 and image.item(i, j, 1) != 0 and image.item(i, j, 2) != 0:
+            if image.item(i, j, 0) != 255 \
+            and image.item(i, j, 1) != 255 \
+            and image.item(i, j, 2) != 255:
                 if i < top:
                     top = i
                 elif i > bottom:
