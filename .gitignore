@@ -24,3 +24,6 @@ test/
 
 # .jpg
 *.jpg
+
+# model file
+*.h5

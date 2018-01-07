@@ -22,7 +22,7 @@ from keras.layers.normalization import BatchNormalization
 
 batch_size    = 100
 epochs        = 1
-iterations    = 100
+iterations    = 1
 num_classes   = 87
 dropout       = 0.25
 weight_decay  = 0.0001
@@ -31,7 +31,7 @@ log_filepath  = './logs'
 
 def scheduler(epoch):
     if epoch <= 30:
-        return 0.001
+        return 0.005
     if epoch <= 60:
         return 0.005
     return 0.001
