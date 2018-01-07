@@ -106,10 +106,10 @@ def build_model():
     model.add(Dropout(dropout))
 
     model.add(Flatten())
-    model.add(Dense(4096))
+    model.add(Dense(2048))
     model.add(Activation('relu'))
     model.add(Dropout(0.5))
-    model.add(Dense(4096))
+    model.add(Dense(2048))
     model.add(Activation('relu'))
     model.add(Dropout(0.5))
     model.add(Dense(1000))
