@@ -126,12 +126,12 @@ def build_model():
     model.add(Dense(num_classes))
     model.add(Activation('softmax'))
     # initiate RMSprop optimizer
-    opt = keras.optimizers.rmsprop(lr=0.0001, decay=1e-6)
+    sgd = optimizers.SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
 
     # Let's train the model using RMSprop
     model.compile(
         loss='categorical_crossentropy',
-        optimizer=opt,
+        optimizer=sgd,
         metrics=['accuracy'])
 
     return model
