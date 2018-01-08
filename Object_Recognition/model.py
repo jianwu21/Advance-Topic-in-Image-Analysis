@@ -63,8 +63,6 @@ def build_model():
     model.add(Activation('relu'))
     model.add(MaxPooling2D(pool_size=(2, 2), strides=(2, 2), padding = 'same'))
 
-    model.add(Dropout(dropout))
-
     model.add(
         Conv2D(
             128,
@@ -83,8 +81,6 @@ def build_model():
     model.add(Activation('relu'))
     model.add(MaxPooling2D(pool_size=(2, 2), strides=(2,2), padding = 'same'))
 
-    model.add(Dropout(dropout))
-
     model.add(
         Conv2D(
             256,
@@ -102,8 +98,6 @@ def build_model():
             kernel_initializer="he_normal"))
     model.add(Activation('relu'))
     model.add(MaxPooling2D(pool_size=(2, 2), strides=(2,2), padding = 'same'))
-
-    model.add(Dropout(dropout))
 
     model.add(
         Conv2D(
@@ -164,13 +158,16 @@ if __name__ == '__main__':
     x_val = []
     y_val = []
 
+    # set image target size here
+    target_size = (100, 100)
+
     # Using all the data for training.
     for im_id in all_training_ims:
         try:
             im = img_to_array(
                 img=load_img(
                     './process_train/' + im_id + '.jpg',
-                    target_size=(224, 224),
+                    target_size=target_size,
                 )
             )
             if im_id in validation_ims:
@@ -190,7 +187,7 @@ if __name__ == '__main__':
             im = img_to_array(
                 img=load_img(
                     './process_test/' + im_id + '.jpg',
-                    target_size=(224, 224),
+                    target_size=target_size,
                 )
             )
             x_test.append(im)
@@ -211,7 +208,7 @@ if __name__ == '__main__':
     # build network
     model = build_model()
     print(model.summary())
-    plot_model(model=model, to_file='./model.png')
+    plot_model(model=model, to_file='./model.png', show_shapes=True)
 
     # set callback
     tb_cb = TensorBoard(log_dir=log_filepath, histogram_freq=0)
