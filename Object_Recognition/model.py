@@ -22,7 +22,7 @@ from keras.layers.normalization import BatchNormalization
 from keras.utils import plot_model
 
 batch_size    = 100
-epochs        = 1
+epochs        = 100
 iterations    = 100
 dropout       = 0.25
 weight_decay  = 0.0001
