@@ -27,3 +27,6 @@ test/
 
 # model file
 *.h5
+
+# Assignment
+Assignment_2/
