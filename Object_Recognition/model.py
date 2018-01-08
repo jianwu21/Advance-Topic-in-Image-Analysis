@@ -22,8 +22,7 @@ from keras.layers.normalization import BatchNormalization
 
 batch_size    = 100
 epochs        = 1
-iterations    = 1
-num_classes   = 87
+iterations    = 100
 dropout       = 0.25
 weight_decay  = 0.0001
 log_filepath  = './logs'
@@ -52,7 +51,7 @@ def build_model():
 
     model.add(
         Conv2D(
-            128,
+            64,
             (3, 3),
             padding='same',
             kernel_regularizer=keras.regularizers.l2(weight_decay),
@@ -61,10 +60,38 @@ def build_model():
         )
     )
     model.add(Activation('relu'))
-    model.add(MaxPooling2D(pool_size=(4, 4), strides=(4,4), padding = 'same'))
+    model.add(MaxPooling2D(pool_size=(2, 2), strides=(2, 2), padding = 'same'))
 
     model.add(Dropout(dropout))
 
+    model.add(
+        Conv2D(
+            128,
+            (3, 3),
+            padding='same',
+            kernel_regularizer=keras.regularizers.l2(weight_decay),
+            kernel_initializer="he_normal"))
+    model.add(Activation('relu'))
+    model.add(
+        Conv2D(
+            128,
+            (3, 3),
+            padding='same',
+            kernel_regularizer=keras.regularizers.l2(weight_decay),
+            kernel_initializer="he_normal"))
+    model.add(Activation('relu'))
+    model.add(MaxPooling2D(pool_size=(2, 2), strides=(2,2), padding = 'same'))
+
+    model.add(Dropout(dropout))
+
+    model.add(
+        Conv2D(
+            256,
+            (3, 3),
+            padding='same',
+            kernel_regularizer=keras.regularizers.l2(weight_decay),
+            kernel_initializer="he_normal"))
+    model.add(Activation('relu'))
     model.add(
         Conv2D(
             256,
@@ -93,26 +120,12 @@ def build_model():
             kernel_regularizer=keras.regularizers.l2(weight_decay),
             kernel_initializer="he_normal"))
     model.add(Activation('relu'))
-    model.add(
-        Conv2D(
-            512,
-            (3, 3),
-            padding='same',
-            kernel_regularizer=keras.regularizers.l2(weight_decay),
-            kernel_initializer="he_normal"))
-    model.add(Activation('relu'))
     model.add(MaxPooling2D(pool_size=(2, 2), strides=(2,2), padding = 'same'))
 
     model.add(Dropout(dropout))
 
     model.add(Flatten())
-    model.add(Dense(2048))
-    model.add(Activation('relu'))
-    model.add(Dropout(0.5))
-    model.add(Dense(2048))
-    model.add(Activation('relu'))
-    model.add(Dropout(0.5))
-    model.add(Dense(1000))
+    model.add(Dense(512))
     model.add(Activation('relu'))
     model.add(Dropout(0.5))
     model.add(Dense(num_classes))
@@ -133,6 +146,10 @@ if __name__ == '__main__':
     train_dict = pickle.load(open('./train.pickle', 'rb'))
     test_dict = pickle.load(open('./test.pickle', 'rb'))
     label_dict = pickle.load(open('./label_dict.pickle', 'rb'))
+
+    num_classes = len(set(train_dict.values()))
+
+    print('Totally {} classes'.format(num_classes))
 
     all_training_ims = train_dict.keys()
     all_testing_ims = test_dict.keys()
