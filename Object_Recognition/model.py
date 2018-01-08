@@ -19,6 +19,7 @@ from keras import optimizers
 from keras.initializers import RandomNormal
 from keras.callbacks import LearningRateScheduler, TensorBoard
 from keras.layers.normalization import BatchNormalization
+from keras.utils import plot_model
 
 batch_size    = 100
 epochs        = 1
@@ -210,6 +211,7 @@ if __name__ == '__main__':
     # build network
     model = build_model()
     print(model.summary())
+    plot_model(model=model, to_file='./model.png')
 
     # set callback
     tb_cb = TensorBoard(log_dir=log_filepath, histogram_freq=0)
