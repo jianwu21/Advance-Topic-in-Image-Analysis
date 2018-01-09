@@ -177,6 +177,7 @@ if __name__ == '__main__':
                 x_train.append(im)
                 y_train.append(label_dict[train_dict[im_id]])
         except IOError:
+            # ignore the issue when loading the bad images
             continue
 
     x_test = []
@@ -193,6 +194,7 @@ if __name__ == '__main__':
             x_test.append(im)
             y_test.append(label_dict[test_dict[im_id]])
         except IOError:
+            # ignore the issue when loading the bad images
             continue
 
     print('{} samples will be trained'.format(len(y_train)))

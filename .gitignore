@@ -11,10 +11,11 @@ IEEEtranBST/
 
 Seg/
 
-# Training data and test data
+# Data folder
 train/
 PlantCLEF2015TestDataWithAnnotations/
 test/
+rigidSfM/
 
 # .db
 *.db
