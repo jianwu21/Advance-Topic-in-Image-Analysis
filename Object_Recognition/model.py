@@ -208,7 +208,8 @@ if __name__ == '__main__':
     # build network
     model = build_model()
     print(model.summary())
-    plot_model(model=model, to_file='./model.png', show_shapes=True)
+    # if you want to plot the model framework
+    # plot_model(model=model, to_file='./model.png', show_shapes=True)
 
     # set callback
     tb_cb = TensorBoard(log_dir=log_filepath, histogram_freq=0)
