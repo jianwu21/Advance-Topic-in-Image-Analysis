@@ -159,7 +159,7 @@ if __name__ == '__main__':
     y_val = []
 
     # set image target size here
-    target_size = (100, 100)
+    target_size = (224, 224)
 
     # Using all the data for training.
     for im_id in all_training_ims:
