@@ -5,5 +5,5 @@ Advanced topics in Image Analysis
  
 - [Segmentation Based on Meanshift](https://github.com/JaggerWu/Advance-Topic-in-Image-Processing/blob/master/Segmentation/Segmentation.ipynb)
 - [Objection Recognition(mainly based on CNN)](https://github.com/JaggerWu/Advance-Topic-in-Image-Processing/tree/master/Object_Recognition)
-- 3D vision
+- [3D vision](https://github.com/JaggerWu/Advance-Topic-in-Image-Processing/tree/master/3D%20Vision) :cry:
 
