@@ -1,4 +1,7 @@
 3D Vision
 ---------
+This is tasks:
 
-Waiting for jwu to write something. :-P
+- [ ] Finish **README.md** doc
+- [ ] Impletement the Fundational Matrix algorithm(8 points/7 points)
+- [ ] Reconstruct model   
