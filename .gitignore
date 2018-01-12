@@ -32,3 +32,6 @@ Assignment_2/
 # process folder
 process_test/
 process_train/
+
+# .swp
+*.swp
