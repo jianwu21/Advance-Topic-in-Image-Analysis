@@ -23,11 +23,12 @@ rigidSfM/
 # pickle
 *.pickle
 
-# .jpg
-*.jpg
-
 # model file
 *.h5
 
 # Assignment
 Assignment_2/
+
+# process folder
+process_test/
+process_train/

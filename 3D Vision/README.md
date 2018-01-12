@@ -9,7 +9,7 @@ The step
 ========
 
 1. [x] Detect 2D points
-1. [x] Match 2D points across 2 images
+1. [x] Match 2D points across 2 images(SIFT feature)
 1. [ ] Epipolar geometry
    - If both intrinsic and extrinsic camera parameters are known, reconstruct with projection matrices.
    - If only the intrinsic parameters are known, normalize coordinates and calculate the essential matrix.
