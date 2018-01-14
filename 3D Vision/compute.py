@@ -10,6 +10,19 @@ def cart2hom(arr):
     return np.asarray(np.vstack([arr, np.ones(arr.shapep[1])]))
 
 
+def hom2cart(arr):
+    '''
+    Convert homogenous to catesian by dividing each row by the last row
+    '''
+
+    # arr has shape: dimensions x num_points
+    num_rows = len(arr)
+    if num_rows == 1 or arr.ndim == 1:
+        return arr
+
+    return np.asarray(arr[:num_rows - 1] / arr[num_rows - 1])
+
+
 def compute_fundemantal(p1, p2):
     '''
     computes the fundamental matrix from corresponding points
