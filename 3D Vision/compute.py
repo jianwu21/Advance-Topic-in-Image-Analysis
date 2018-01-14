@@ -1,4 +1,5 @@
 import numpy as np
+from matplotlib import pyplot as plt
 
 
 def cart2hom(arr):
@@ -7,7 +8,7 @@ def cart2hom(arr):
     '''
     if arr.ndim == 1:
         return np.hstack([arr, 1])
-    return np.asarray(np.vstack([arr, np.ones(arr.shapep[1])]))
+    return np.asarray(np.vstack([arr, np.ones(arr.shape[1])]))
 
 
 def hom2cart(arr):
@@ -23,24 +24,24 @@ def hom2cart(arr):
     return np.asarray(arr[:num_rows - 1] / arr[num_rows - 1])
 
 
-def compute_fundemantal(p1, p2):
+def compute_fundamental(p1, p2):
     '''
     computes the fundamental matrix from corresponding points
     (p1, p2, 3*n arrays) using the normalized 8 point algorithm.
-    each row is constructed as [x’*x, x’*y, x’, y’*x, y’*y, y’, x, y, 1]
+    each row is constructed as [x'*x, x'*y, x', y'*x, y'*y, y', x, y, 1]
     '''
 
     n = p1.shape[1]
     if p2.shape[1] != n:
-        raise ValueError("Number of points don’t match.")
+        raise ValueError('Number of points don\'t match.')
 
     # build matrix for equations
-    A = zeros((n,9))
+    A = np.zeros((n,9))
     for i in range(n):
         A[i] = [
             p1[0,i]*p2[0,i], p1[0,i]*p2[1,i], p1[0,i]*p2[2,i],
-            pp1[1,i]*p2[0,i], p1[1,i]*p2[1,i], p1[1,i]*p2[2,i],
-            pp1[2,i]*p2[0,i], p1[2,i]*p2[1,i], p1[2,i]*p2[2,i],
+            p1[1,i]*p2[0,i], p1[1,i]*p2[1,i], p1[1,i]*p2[2,i],
+            p1[2,i]*p2[0,i], p1[2,i]*p2[1,i], p1[2,i]*p2[2,i],
         ]
 
         # compute linear least square solution
@@ -91,3 +92,29 @@ def reconstruct_points(p1, p2, m1, m2):
         res[:, i] = reconstruct_one_point(p1[:, i], p2[:, i], m1, m2)
 
     return res
+
+
+def plot_epipolar_line(im, F, x, epipole=None, show_epipole=True):
+    '''
+    Plot the epipole and epipolar line F*x=0
+    in an image. F is the fundamental matrix
+    and x a point in the other image.
+    '''
+
+    m, n = im.shape[:2]
+    line = np.dot(F, x)
+    # epipolar line parameter and values
+    t = np.linspace(0, n, 100)
+    lt = np.array(
+        [
+            (line[2]+line[0]*tt)/(-line[1])
+            for tt in t
+        ]
+    )
+    # take only line points inside the image
+    ndx = (lt >= 0) & (lt < m)
+    plt.plot(t[ndx], lt[ndx], linewidth=2)
+    if show_epipole:
+        if epipole is None:
+            epipole = compute_epipole(F)
+            plt.plot(epipole[0]/epipole[2], epipole[1]/epipole[2], 'r*')
