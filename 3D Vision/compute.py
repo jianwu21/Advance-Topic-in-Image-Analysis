@@ -1,6 +1,15 @@
 import numpy as np
 
 
+def cart2hom(arr):
+    '''
+    Convert catesian to homogenous pointd by appending a row of 1s
+    '''
+    if arr.ndim == 1:
+        return np.hstack([arr, 1])
+    return np.asarray(np.vstack([arr, np.ones(arr.shapep[1])]))
+
+
 def compute_fundemantal(p1, p2):
     '''
     computes the fundamental matrix from corresponding points
