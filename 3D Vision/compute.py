@@ -32,3 +32,16 @@ def compute_fundemantal(p1, p2):
         F = np.dot(U, np.dot(np.diag(S), V))
 
         return F
+
+
+def compute_epipole(F):
+    '''
+    Computes the (right) epipole from a fundamental matrix F.
+    TODO: Compute the left epipole with F.T
+    '''
+
+    # return null space of F(Fx=0)
+    U, S, V = np.linalg.svd(F)
+    e = V[-1]
+
+    return e / e[2]
