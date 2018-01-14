@@ -45,3 +45,27 @@ def compute_epipole(F):
     e = V[-1]
 
     return e / e[2]
+
+
+def reconstruct_one_point(pt1, pt2, m1, m2):
+    '''
+    pt1 and m1 * X are parallel and cross product = 0
+    pt1 x m1 * X = pt2 x m2 * X = 0
+    '''
+    A = np.vstack([
+        np.dot(skew(pt1), m1),
+    ])
+    U, S, V = np.linalg.svd(A)
+    P = np.ravel(V[-1, :4])
+
+    return p / p[3]
+
+
+def reconstruct_points(p1, p2, m1, m2):
+    num_points = p1.shape[1]
+    res = np.ones((4, num_points))
+
+    for i in range(num_points):
+        res[:, i] = reconstruct_one_point(p1[:, i], p2[:, i], m1, m2)
+
+    return res
