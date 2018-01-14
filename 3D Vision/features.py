@@ -48,6 +48,5 @@ def find_correspondence_points(img1, img2):
     pts2 = dst_pts[mask == 1]
 
     plt.imshow(img3)
-    plt.show()
 
     return pts1.T, pts2.T
