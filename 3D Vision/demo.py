@@ -6,11 +6,14 @@ from features import find_correspondence_points
 
 from compute import *
 
-im_1 = plt.imread('./rigidSfM/DSCN0976.JPG')
-im_2 = plt.imread('./rigidSfM/DSCN0980.JPG')
+im_1 = plt.imread('./rigidSfM/DSCN0956.JPG')
+im_2 = plt.imread('./rigidSfM/DSCN0953.JPG')
 
 plt.imshow(im_2)
 pts1, pts2 = find_correspondence_points(im_1, im_2)
+
+num = pts1.shape[1]
+print('Totally {} points correspondence'.format(num))
 
 points1 = cart2hom(pts1)
 points2 = cart2hom(pts2)
@@ -29,16 +32,6 @@ F = compute_fundamental(points1, points2)
 # compute the epipole
 e = compute_epipole(F)
 
-# new figure
-plt.figure()
-plt.imshow(im_1)
-for i in range(20):
-    plot_epipolar_line(im_1, F, points2[:, i], e, False)
-
-# new figure
-plt.figure()
-plt.imshow(im_2)
-for i in range(20):
-    plot_epipolar_line(im_2, F, points1[:, i].T, e, False)
+plot_epipolar_lines(im_1, im_2, points1, points2, F, show_epipole=True)
 
 plt.show()
