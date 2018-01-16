@@ -30,11 +30,12 @@ def find_correspondence_points(img1, img2):
         else:
             bad.append([m])
 
-    img3 = cv2.drawMatchesKnn(img1, kp1, img2, kp2, good[:200],
-                              None, matchColor=(0,255,0), flags=2)
+    # img3 = cv2.drawMatchesKnn(img1, kp1, img2, kp2, good[:200],
+    #                           None, matchColor=(0,255,0), flags=2)
 
     # save the out_put image for displaying
-    plt.imsave('./imgs/feature_match.jpg', img3)
+    # plt.imsave('./imgs/feature_match.jpg', img3)
+    # plt.imshow(img3)
 
     src_pts = np.asarray([kp1[m[0].queryIdx].pt for m in good])
     dst_pts = np.asarray([kp2[m[0].trainIdx].pt for m in good])
@@ -46,7 +47,5 @@ def find_correspondence_points(img1, img2):
     # We select only inlier points
     pts1 = src_pts[mask == 1]
     pts2 = dst_pts[mask == 1]
-
-    plt.imshow(img3)
 
     return pts1.T, pts2.T
