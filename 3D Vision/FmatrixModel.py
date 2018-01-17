@@ -32,10 +32,10 @@ class FundamentalMatrixModel(object):
         # Sampson distance (first-order approximation to geometric error)
         p2_fit = np.dot(F, p1)
         p1_fit = np.dot(F.T, p2)
-        p2_f_p1 = np.sum(np.dot(p2.T, p1), axis = 1)
+        p2_f_p1 = np.sum(np.dot(p1_fit.T, p1), axis = 1)
 
         return np.sqrt(
-            p2_f_p1**2 / \
+            p2_f_p1**2 /\
             (p2_fit[0, :]**2 + p2_fit[1, :]**2 + \
              p1_fit[0, :]**2 + p1_fit[1, :]**2)
         )

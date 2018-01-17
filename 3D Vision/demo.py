@@ -31,23 +31,20 @@ def demo():
 
     # compute F
     model = FundamentalMatrixModel()
-    _, good_idxs = ransac(
-        model=model, x=points1, y=points2, nsamples=8, threshold=5e9,
-        maxiter =1000, debug=True)
+    F, good_idxs = ransac(
+        model=model, x=points1, y=points2, nsamples=100, threshold=10,
+        maxiter =10000, debug=True)
 
-    if len(good_idxs) == 0:
-        raise ValueError('No best inliers are found.')
-
-    F = model.fit(points1[:, good_idxs], points2[:, good_idxs])
-
-    # F_opt, _ = fmatrix(points1.T, points2.T)
-    # compute the epipole
-    e = compute_epipole(F)
+    if good_idxs is None:
+        raise ValueError('Failing in RANSAC')
 
     plot_epipolar_lines(im_1, im_2, points1, points2, F, show_epipole=False)
 
-    plt.show()
+    # Using cv2 to find
+    # F, _ = cv2.findFundamentalMat(points1[:2].T, points2[:2].T, cv2.RANSAC, 6.0)
+    # plot_epipolar_lines(im_1, im_2, points1, points2, F, show_epipole=False)
 
+    plt.show()
 
 if __name__ == '__main__':
     demo()
