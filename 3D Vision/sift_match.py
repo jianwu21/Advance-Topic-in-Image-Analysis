@@ -25,7 +25,7 @@ def find_correspondence_points(img1, img2):
     bad = []
 
     for i, (m, n) in enumerate(matches):
-        if m.distance < 0.8 * n.distance:
+        if m.distance < 0.75 * n.distance:
             good.append([m])
         else:
             bad.append([m])
@@ -48,4 +48,4 @@ def find_correspondence_points(img1, img2):
     pts1 = src_pts[mask == 1]
     pts2 = dst_pts[mask == 1]
 
-    return src_pts.T, dst_pts.T
+    return pts1.T, pts2.T

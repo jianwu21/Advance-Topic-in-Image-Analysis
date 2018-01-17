@@ -55,11 +55,11 @@ def plot_epipolar_line(im, F, x, epipole=None, show_epipole=True):
     )
     # take only line points inside the image
     ndx = (lt>=0) & (lt<m)
-    plt.plot(t[ndx], lt[ndx], linewidth=2)
+    plt.plot(t[ndx], lt[ndx], linewidth=0.5)
     if show_epipole:
         if epipole is None:
             epipole = compute_epipole(F)
-        plt.plot(epipole[0]/epipole[2], epipole[1]/epipole[2], 'r*')
+        plt.plot(epipole[0]/epipole[2], epipole[1]/epipole[2], 'b*')
 
 
 def plot_epipolar_lines(im_1, im_2, points1, points2, F, show_epipole=False):
@@ -71,11 +71,13 @@ def plot_epipolar_lines(im_1, im_2, points1, points2, F, show_epipole=False):
     plt.imshow(im_1)
 
     for i in range(num):
-        plot_epipolar_line(im_1, F, points2[:, i], epipole=None, show_epipole=True)
+        plot_epipolar_line(
+            im_1, F, points2[:, i], epipole=None, show_epipole=show_epipole)
 
     # show the epipolar line for im_2
     plt.figure()
     plt.imshow(im_2)
 
     for i in range(num):
-        plot_epipolar_line(im_2, F.T, points1[:, i], epipole=None, show_epipole=True)
+        plot_epipolar_line(
+            im_2, F.T, points1[:, i], epipole=None, show_epipole=show_epipole)
