@@ -1,5 +1,3 @@
-from __future__ import absolute_import, division, print_function
-
 import numpy as np
 
 
@@ -30,11 +28,11 @@ class FundamentalMatrixModel(object):
 
         return F
 
-    def error(self, F, p1, p2):
+    def get_error(self, F, p1, p2):
         # Sampson distance (first-order approximation to geometric error)
-        p2_fit = np.dot(F, p1)					        # F * m
-        p1_fit = np.dot(F.T, p2)				     	# F.T * m'
-        p2_f_p1 = np.sum(np.dot(p2.T, p1), axis = 1)	# m'.T * F * m
+        p2_fit = np.dot(F, p1)
+        p1_fit = np.dot(F.T, p2)
+        p2_f_p1 = np.sum(np.dot(p2.T, p1), axis = 1)
 
         return np.sqrt(
             p2_f_p1**2 / \
