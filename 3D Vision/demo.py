@@ -5,7 +5,7 @@ import numpy as np
 from compute import *
 from sift_match import find_correspondence_points
 from FmatrixModel import FundamentalMatrixModel
-from Fmatrix import *
+from OptimizeFmatrix import *
 from ransac import *
 
 
@@ -29,25 +29,23 @@ def demo():
     ax[1].imshow(cv2.cvtColor(im_2, cv2.COLOR_BGR2RGB))
     ax[1].plot(points2[0], points2[1], 'r.')
 
-    # compute F
-    model = FundamentalMatrixModel()
-    F, good_idxs = ransac(
-        model=model, x=points1, y=points2, nsamples=5, threshold=10,
-        maxiter =1000, desiredprob=0.9, debug=False)
-    print(good_idxs)
-
-    print('The number of inliner is {}'.format(len(good_idxs)))
-    if good_idxs is None:
-        raise ValueError('Failing in RANSAC')
-
-    plot_epipolar_lines(im_1, im_2, points1[:, good_idxs], points2[:, good_idxs], F, show_epipole=False)
-
+    '''
     # Using cv2 to find
     F, mask = cv2.findFundamentalMat(
         points1[:2].T, points2[:2].T, cv2.FM_RANSAC)
     print('The number of inliner by OpenCV is {}'.format(len(mask.ravel()==1)))
     plot_epipolar_lines(
         im_1, im_2, points1[:, mask.ravel()==1], points2[:, mask.ravel()==1], F, show_epipole=False)
+    '''
+    # opt
+    F0, F, inliers = fmatrix(points1.T, points2.T)
+    print(inliers)
+    plot_epipolar_lines(
+        im_1, im_2, points1[:, inliers], points2[:, inliers], F0,
+        show_epipole=False)
+    plot_epipolar_lines(
+        im_1, im_2, points1[:, inliers], points2[:, inliers], F,
+        show_epipole=False)
 
     plt.show()
 

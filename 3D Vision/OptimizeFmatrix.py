@@ -35,7 +35,7 @@ def fmatrix(xy1, xy2):
 	F = dot(P2.T, dot(fmatrix_from_params(Fp), P1))
 
 	del xy1_T1, xy2_T2
-	return stabilize(normalize_norm(F)), inliers
+	return F0_T, stabilize(normalize_norm(F)), inliers
 
 
 def normalization_matrix(xy):
@@ -112,8 +112,10 @@ def stabilize(x, tol = 1e-6):
 
 def kernel(A, both = False):
 	U, s, Vh = svd(A)
-	if both: return Vh.T[:, -1], U[:, -1]
-	else: return Vh.T[:, -1]
+	if both:
+		return Vh.T[:, -1], U[:, -1]
+	else:
+		return Vh.T[:, -1]
 
 
 def normalize_norm(A):
