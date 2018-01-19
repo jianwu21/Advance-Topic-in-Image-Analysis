@@ -30,7 +30,6 @@ def ransac(model, x, y, nsamples, threshold, maxiter = 1e2, desiredprob = 0.99,
 
         ninliers = also_idxs.shape[0]
         if ninliers > best_ninliers:
-            print(x_maybeinliers.shape, x_alsoinliers.shape)
             betterx = concatenate((x_maybeinliers, x_alsoinliers), axis=1)
             bettery = concatenate((y_maybeinliers, y_alsoinliers), axis=1)
             bestfit = model.fit(betterx, bettery)
