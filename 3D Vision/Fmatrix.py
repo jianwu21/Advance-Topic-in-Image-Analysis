@@ -1,9 +1,9 @@
-from __future__ import absolute_import, division, print_function
-
 from pylab import *
+import scipy.optimize as opt
+import scipy.linalg as alg
+
 from ransac import *
 from FmatrixModel import *
-import scipy.optimize as opt
 
 
 def fmatrix(xy1, xy2):
@@ -14,7 +14,7 @@ def fmatrix(xy1, xy2):
 	xy2_T2 = dot(xy2, T2.T)		# T2 * X'
 
 	# RANSAC to reject outliers and LM initialized with RANSAC output
-	F0_T, inliers = ransac(FundamentalMatrixModel(), xy1_T1, xy2_T2, 8, 1e-3)
+	F0_T, inliers = ransac(FundamentalMatrixModel(), xy1_T1.T, xy2_T2.T, 8, 1)
 	F0 = dot(T2.T, dot(F0_T, T1))
 
 	Fp0, P1, P2 = params_from_fmatrix(F0)
@@ -114,3 +114,7 @@ def kernel(A, both = False):
 	U, s, Vh = svd(A)
 	if both: return Vh.T[:, -1], U[:, -1]
 	else: return Vh.T[:, -1]
+
+
+def normalize_norm(A):
+	return A / alg.norm(A)
