@@ -45,6 +45,8 @@ def plot_epipolar_line(im, F, x, epipole=None, show_epipole=True):
     in an image. F is the fundamental matrix
     and x a point in the other image.
     '''
+    # plot the point
+    plt.plot(x[0], x[1], 'r*')
 
     m, n = im.shape[:2]
     line = np.dot(F, x)
