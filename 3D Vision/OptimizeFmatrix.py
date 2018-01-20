@@ -14,7 +14,8 @@ def fmatrix(xy1, xy2):
 	xy2_T2 = dot(xy2, T2.T)		# T2 * X'
 
 	# RANSAC to reject outliers and LM initialized with RANSAC output
-	F0_T, inliers = ransac(FundamentalMatrixModel(), xy1_T1.T, xy2_T2.T, 8, 1)
+	F0_T, inliers = ransac(
+		FundamentalMatrixModel(), xy1_T1.T, xy2_T2.T, 8, 1e-3, 1000)
 	F0 = dot(T2.T, dot(F0_T, T1))
 
 	Fp0, P1, P2 = params_from_fmatrix(F0)
