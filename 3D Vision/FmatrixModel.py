@@ -17,16 +17,9 @@ class FundamentalMatrixModel(object):
             ]
 
         # compute linear least square solution
-        U,S,V = np.linalg.svd(A)
-        F = V[-1].reshape(3,3)
-
         # constrain F
         # make rank 2 by zeroing out last singular value
-        U,S,V = np.linalg.svd(F)
-        S[-1] = 0
-        F = np.dot(U, np.dot(np.diag(S), V))
-
-        return F
+        return reduce_rank(kernel(A).reshape(3, 3))
 
     def get_error(self, F, p1, p2):
         # Sampson distance (first-order approximation to geometric error)
@@ -39,3 +32,21 @@ class FundamentalMatrixModel(object):
             (p2_fit[0, :]**2 + p2_fit[1, :]**2 + \
              p1_fit[0, :]**2 + p1_fit[1, :]**2)
         )
+
+
+# Functions
+def kernel(A, both = False):
+	U, s, Vh = np.linalg.svd(A)
+	if both:
+		return Vh.T[:, -1], U[:, -1]
+	else:
+		return Vh.T[:, -1]
+
+
+def reduce_rank(A, n = 1):
+	U, s, Vh = np.linalg.svd(A)
+	return np.dot(
+        np.dot(
+            U,
+            np.diag(np.hstack((s[:-n], np.zeros(n))))), 
+        Vh)

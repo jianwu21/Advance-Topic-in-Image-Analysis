@@ -110,13 +110,5 @@ def stabilize(x, tol = 1e-6):
 	return xs
 
 
-def kernel(A, both = False):
-	U, s, Vh = svd(A)
-	if both:
-		return Vh.T[:, -1], U[:, -1]
-	else:
-		return Vh.T[:, -1]
-
-
 def normalize_norm(A):
 	return A / alg.norm(A)
