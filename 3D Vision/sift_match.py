@@ -32,12 +32,20 @@ def find_correspondence_points(img1, img2):
         else:
             bad.append([m])
 
-    img3 = cv2.drawMatchesKnn(img1, kp1, img2, kp2, good[:20],
-                              None, matchColor=(0,255,0), flags=2)
+    # FIXME: if you want to plot the matches
+    # img3 = cv2.drawMatchesKnn(
+    #     img1,
+    #     kp1,
+    #     img2,
+    #     kp2,
+    #     good[:20],
+    #     None,
+    #     matchColor=(255,0,0),
+    #     flags=2,
+    #     singlePointColor=(0,255,0),
+    # )
 
-    # save the out_put image for displaying
-    # plt.imsave('./imgs/feature_match.jpg', img3)
-    plt.imshow(img3)
+    #  plt.imshow(img3)
 
     src_pts = np.asarray([kp1[m[0].queryIdx].pt for m in good])
     dst_pts = np.asarray([kp2[m[0].trainIdx].pt for m in good])
