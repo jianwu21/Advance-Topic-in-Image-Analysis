@@ -48,5 +48,6 @@ def reduce_rank(A, n = 1):
 	return np.dot(
         np.dot(
             U,
-            np.diag(np.hstack((s[:-n], np.zeros(n))))), 
+            np.diag(np.hstack((s[:-n], np.zeros(n))))
+        ), 
         Vh)

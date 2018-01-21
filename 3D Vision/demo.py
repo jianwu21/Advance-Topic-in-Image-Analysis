@@ -1,6 +1,7 @@
 import cv2
 from matplotlib import pyplot as plt
 import numpy as np
+import sys
 
 from compute import *
 from sift_match import find_correspondence_points
@@ -9,9 +10,9 @@ from OptimizeFmatrix import *
 from ransac import *
 
 
-def demo():
-    im_1 = plt.imread('./rigidSfM/DSCN0974.JPG')
-    im_2 = plt.imread('./rigidSfM/DSCN0975.JPG')
+def demo(path_1, path_2):
+    im_1 = plt.imread(path_1)
+    im_2 = plt.imread(path_2)
 
     pts1, pts2 = find_correspondence_points(im_1, im_2)
 
@@ -21,22 +22,25 @@ def demo():
     points1 = cart2hom(pts1)
     points2 = cart2hom(pts2)
 
-    fig, ax = plt.subplots(1, 2)
-    ax[0].autoscale_view('tight')
-    ax[0].imshow(cv2.cvtColor(im_1, cv2.COLOR_BGR2RGB))
-    ax[0].plot(points1[0], points1[1], 'r.')
-    ax[1].autoscale_view('tight')
-    ax[1].imshow(cv2.cvtColor(im_2, cv2.COLOR_BGR2RGB))
-    ax[1].plot(points2[0], points2[1], 'r.')
+    plt.figure()
+    plt.imshow(cv2.cvtColor(im_1, cv2.COLOR_BGR2RGB))
+    plt.plot(points1[0], points1[1], 'r.')
 
-    '''
-    # Using cv2 to find
-    F, mask = cv2.findFundamentalMat(
-        points1[:2].T, points2[:2].T, cv2.FM_RANSAC)
-    print('The number of inliner by OpenCV is {}'.format(len(mask.ravel()==1)))
+    plt.figure()
+    plt.imshow(cv2.cvtColor(im_2, cv2.COLOR_BGR2RGB))
+    plt.plot(points2[0], points2[1], 'r.')
+
+    # original F without RANSAC
+    model = FundamentalMatrixModel()
+    F_bad = model.fit(points1, points2)
     plot_epipolar_lines(
-        im_1, im_2, points1[:, mask.ravel()==1], points2[:, mask.ravel()==1], F, show_epipole=False)
-    '''
+        im_1,
+        im_2,
+        points1,
+        points2,
+        F_bad,
+        show_epipole=False)
+
     # opt
     F0, F, inliers = fmatrix(points1.T, points2.T)
     print(inliers)
@@ -47,8 +51,20 @@ def demo():
         im_1, im_2, points1[:, inliers], points2[:, inliers], F,
         show_epipole=False)
 
+    # Using cv2 to find
+    cv_F, mask = cv2.findFundamentalMat(
+        points1[:2].T, points2[:2].T, cv2.FM_RANSAC)
+    print('The number of inliner by OpenCV is {}'.format(len(mask.ravel()==1)))
+    plot_epipolar_lines(
+        im_1,
+        im_2,
+        points1[:, inliers],
+        points2[:, inliers],
+        cv_F,
+        show_epipole=False)
+
     plt.show()
 
 
 if __name__ == '__main__':
-    demo()
+    demo(sys.argv[1], sys.argv[2])
