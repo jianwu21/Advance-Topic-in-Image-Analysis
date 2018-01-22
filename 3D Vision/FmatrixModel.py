@@ -1,3 +1,5 @@
+from __future__ import division
+
 import numpy as np
 
 
@@ -49,5 +51,5 @@ def reduce_rank(A, n = 1):
         np.dot(
             U,
             np.diag(np.hstack((s[:-n], np.zeros(n))))
-        ), 
+        ),
         Vh)
