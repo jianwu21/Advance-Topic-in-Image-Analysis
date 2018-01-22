@@ -3,8 +3,8 @@ from __future__ import absolute_import, division, print_function
 from pylab import *
 
 
-def ransac(model, x, y, nsamples, threshold, maxiter = 1e2, desiredprob = 0.99,
-           debug = False):
+def ransac(model, x, y, nsamples, threshold, maxiter = 1e3,
+           desiredprob = 0.9, debug = False):
     iterations = 0
     ndata = x.shape[1]
     best_inlier_idxs = None
