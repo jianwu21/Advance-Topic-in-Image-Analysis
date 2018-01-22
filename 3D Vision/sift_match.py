@@ -5,7 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def find_correspondence_points(img1, img2):
+def find_correspondence_points(img1, img2, all=False):
     sift = cv2.xfeatures2d.SIFT_create()
 
     # find the keypoints and descriptors with SIFT
@@ -47,8 +47,13 @@ def find_correspondence_points(img1, img2):
 
     #  plt.imshow(img3)
 
-    src_pts = np.asarray([kp1[m[0].queryIdx].pt for m in good])
-    dst_pts = np.asarray([kp2[m[0].trainIdx].pt for m in good])
+    if all:
+        all_pts = good + bad
+    else:
+        all_pts = good
+
+    src_pts = np.asarray([kp1[m[0].queryIdx].pt for m in all_pts])
+    dst_pts = np.asarray([kp2[m[0].trainIdx].pt for m in all_pts])
 
     # Constrain matches to fit homography
     retval, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC, 100.0)
