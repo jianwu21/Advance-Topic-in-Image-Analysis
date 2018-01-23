@@ -36,7 +36,7 @@ def generate_data(learning_type='train'):
         )
 
         if img_info['Content'] == 'LeafScan':
-            LeafScan_dict[img_id] = img_info['Family']
+            LeafScan_dict[img_id] = img_info['Species']
 
     pickle.dump(
         LeafScan_dict,
