@@ -4,6 +4,7 @@ import numpy as np
 from mean_shift_utils import euclid_distance
 
 MIN_DISTANCE = 0.1
+C = 1
 
 
 class mean_shift(object):
@@ -17,7 +18,7 @@ class mean_shift(object):
         tiled_weights = np.tile(point_weights, [len(point), 1])
         denominator = sum(point_weights)
 
-        shifted_point = np.multiply(
+        shifted_point = C * np.multiply(
             tiled_weights.transpose(), points).sum(axis=0) / denominator
 
         return np.array(shifted_point)
@@ -62,5 +63,5 @@ class mean_shift(object):
             if i % 100 == 0:
                 print('Filtering {}th pixel has been done!'.format(i))
             '''
-            
+
         return shift_points
