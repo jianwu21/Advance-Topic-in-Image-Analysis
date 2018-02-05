@@ -1,10 +1,9 @@
-Object Recognition
+# Object Recognition
 ------------------
 
 This is the second part **Object Recognition** in Advanced Topics in Image Analysis, which is mainly about plant identification task. The dataset is from [LifeCLEF](http://www.imageclef.org/lifeclef/2015/plant).
 
-Introduction for all code
-=========================
+## Introduction for all code files
 
 - `logs/` the log file about model training, you can run it by `tensorboard --logdir='./logs/'`
 - `preprocess/` includes the files which do the segmentation of LeafScan.
@@ -12,8 +11,7 @@ Introduction for all code
 - `handle_orig_images.py` pre-process all  original images.
 - `model.py` Building the model, mainly implemented by [Keras](https://keras.io/).
 
-The CNN model framework
-=======================
+## The CNN model framework
 
 ```
 _________________________________________________________________
